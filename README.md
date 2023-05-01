@@ -33,3 +33,5 @@ frequency = "2h"
 - Automatic deletion after e.g. a period of time
 - Improved logging (tracing?)
 - Save metadata somewhere
+- Dockerfile for easy deployment
+- Improve cli docs
