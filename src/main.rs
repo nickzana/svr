@@ -1,5 +1,3 @@
-#![feature(async_closure)]
-
 use config::Config;
 use futures::future::join_all;
 use std::sync::Arc;
