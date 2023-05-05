@@ -49,3 +49,4 @@ svr:
 - Improved logging (tracing?)
 - Save metadata somewhere
 - Add --help menu
+- Web GUI for subscription management
