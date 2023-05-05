@@ -81,10 +81,17 @@ impl Stream {
                 loop {
                     match dl.run_async().await {
                         Ok(YoutubeDlOutput::SingleVideo(video)) => {
-                            println!("Successfully downloading video `{url:#?}`: {video:#?}");
+                            println!(
+                                "Successfully downloaded {} `{url:#?}`: {video:#?}",
+                                if Some(true) == video.is_live {
+                                    "livestream"
+                                } else {
+                                    "video"
+                                }
+                            );
                         }
                         Ok(YoutubeDlOutput::Playlist(playlist)) => {
-                            println!("Successfully downloading playlist `{url:#?}`: {playlist:#?}");
+                            println!("Successfully downloaded playlist `{url:#?}`: {playlist:#?}");
                         }
                         Err(e) => {
                             let err = if let youtube_dl::Error::ExitCode { stderr, .. } = e {
