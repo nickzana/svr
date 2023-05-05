@@ -5,7 +5,10 @@ use youtube_dl::{YoutubeDl, YoutubeDlOutput};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Config {
+    #[serde(rename = "ytdl-path")]
     pub youtube_dl_path: Option<PathBuf>,
+    #[serde(rename = "cookies")]
+    pub cookie_jar_path: Option<PathBuf>,
     pub output: PathBuf,
     pub streams: Vec<Stream>,
 }
@@ -29,6 +32,9 @@ pub enum Stream {
         subpath: Option<PathBuf>,
         // Overrides Config::output, still respects subpath (becomes relative to new output)
         output: Option<PathBuf>,
+        // YouTube only
+        #[serde(default)]
+        live_from_start: bool,
     },
 }
 
@@ -45,26 +51,34 @@ impl Stream {
                 quality,
                 subpath,
                 output,
+                live_from_start,
             } => {
+                let mut dl = YoutubeDl::new(url);
+                dl.download(true);
+
+                if let Some(path) = &config.youtube_dl_path {
+                    dl.youtube_dl_path(path);
+                }
+
+                if let Some(quality) = quality {
+                    dl.format(quality);
+                }
+
+                let mut output_dir = output.clone().unwrap_or(config.output.clone());
+                if let Some(subpath) = subpath {
+                    output_dir = output_dir.join(subpath);
+                }
+                dl.output_directory(output_dir.to_string_lossy());
+
+                if let Some(path) = &config.cookie_jar_path {
+                    dl.cookies(path.to_string_lossy());
+                }
+
+                if *live_from_start {
+                    dl.extra_arg("--live-from-start");
+                }
+
                 loop {
-                    // TODO: Can this dl struct be reused?
-                    let mut dl = YoutubeDl::new(url);
-                    dl.download(true);
-
-                    if let Some(path) = &config.youtube_dl_path {
-                        dl.youtube_dl_path(path);
-                    }
-
-                    if let Some(quality) = quality {
-                        dl.format(quality);
-                    }
-
-                    let mut output_dir = output.clone().unwrap_or(config.output.clone());
-                    if let Some(subpath) = subpath {
-                        output_dir = output_dir.join(subpath);
-                    }
-                    dl.output_directory(output_dir.to_string_lossy());
-
                     match dl.run_async().await {
                         Ok(YoutubeDlOutput::SingleVideo(video)) => {
                             println!("Successfully downloading video `{url:#?}`: {video:#?}");
