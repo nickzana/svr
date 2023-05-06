@@ -2,3 +2,5 @@
 config.toml
 /vendor
 /.cargo/config.toml
+Cargo.lock
+cookies.txt
