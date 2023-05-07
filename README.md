@@ -32,13 +32,15 @@ frequency = "2h"
 
 ## Example `docker-compose.yml`:
 ```yaml
-svr:
-  container_name: svr
-  image: git.nickzana.dev/nick/svr:latest
-  volumes:
-    - $CONFIG/config.toml:/config.toml
-    - $MEDIA_PATH/livestreams:/media/livestreams
-  restart: unless-stopped
+version: "3.0"
+services:
+  svr:
+    container_name: svr
+    image: git.nickzana.dev/nick/svr:latest
+    volumes:
+      - $CONFIG/config.toml:/config.toml
+      - $MEDIA_PATH/livestreams:/media/livestreams
+    restart: unless-stopped
 ```
 
 ## TODO
